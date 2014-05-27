@@ -152,7 +152,7 @@ object but everyone else disagrees so jsex allows naked json values by default.
 `true` and `false`              | `true` and `false`
 `null`                          | `nil`
 `array`                         | `List`
-`object`                        | `[{}]`, `Dict` and `Record`
+`object`                        | `[{}]`, `Dict`, `Record` and `Struct`
 
 #### numbers ####
 

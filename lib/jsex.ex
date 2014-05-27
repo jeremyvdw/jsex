@@ -99,6 +99,7 @@ defmodule JSEX.Decoder do
 end
 
 defprotocol JSEX.Encoder do
+  @fallback_to_any true
   def json(term)
 end
 
@@ -126,7 +127,9 @@ defimpl JSEX.Encoder, for: List do
 end
 
 defimpl JSEX.Encoder, for: Tuple do
-  def json(record) when is_record(record) do
+  import Record
+
+  def json(record) when record?(record) do
     if function_exported?(elem(record, 0), :__record__, 1) do
       JSEX.Encoder.json Enum.map(
         record.__record__(:fields),
@@ -155,6 +158,13 @@ defimpl JSEX.Encoder, for: [Number, Integer, Float, BitString] do
   def json(value), do: [value]
 end
 
-defimpl JSEX.Encoder, for: [PID, Any] do
+defimpl JSEX.Encoder, for: [PID] do
   def json(_), do: raise ArgumentError
+end
+
+defimpl JSEX.Encoder, for: Any do
+  def json(anything) do
+    [_ | list] = Map.to_list(anything)
+    JSEX.Encoder.json(list)
+  end
 end

@@ -220,6 +220,53 @@ defmodule JSEX.Tests.Records do
   end
 end
 
+defmodule JSEX.Tests.Struct do
+  use ExUnit.Case
+
+  defmodule SimpleStruct do
+    defstruct name: nil, rank: nil
+  end
+
+  defmodule SimplerStruct do
+    defstruct name: nil
+  end
+
+  test "encode a simple struct" do
+    assert(JSEX.encode(%SimpleStruct{name: "Walder Frey", rank: "Lord"})
+      == { :ok, "{\"name\":\"Walder Frey\",\"rank\":\"Lord\"}" })
+  end
+
+  test "encode a list of simple struct" do
+    assert(JSEX.encode([%SimpleStruct{name: "Walder Frey", rank: "Lord"}])
+      == { :ok, "[{\"name\":\"Walder Frey\",\"rank\":\"Lord\"}]" })
+  end
+
+  test "encode a simpler struct" do
+    assert(JSEX.encode(%SimplerStruct{name: "Walder Frey"})
+      == { :ok, "{\"name\":\"Walder Frey\"}" })
+  end
+
+  test "encode a list of simpler struct" do
+    assert(JSEX.encode([%SimplerStruct{name: "Walder Frey"}])
+      == { :ok, "[{\"name\":\"Walder Frey\"}]" })
+  end
+
+  defmodule BasicStruct do
+    defstruct name: nil, rank: nil
+  end
+
+  defimpl JSEX.Encoder, for: BasicStruct do
+    def json(struct) do
+      [:start_object, "name", struct.rank <> " " <> struct.name, :end_object]
+    end
+  end
+
+  test "encode a basic struct with a protocol defined" do
+    assert(JSEX.encode(%BasicStruct{name: "Walder Frey", rank: "Lord"})
+      == { :ok, "{\"name\":\"Lord Walder Frey\"}" })
+  end
+end
+
 defmodule JSEX.Tests.Is do
   use ExUnit.Case
 
