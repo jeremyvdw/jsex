@@ -163,8 +163,12 @@ defimpl JSEX.Encoder, for: [PID] do
 end
 
 defimpl JSEX.Encoder, for: Any do
-  def json(anything) do
-    [_ | list] = Map.to_list(anything)
-    JSEX.Encoder.json(list)
+  def json(object) when is_map(object) do
+    case Map.to_list(object) do
+      [{:__struct__, _} | tail] -> 
+        JSEX.Encoder.json(tail)
+      _ ->
+        JSEX.Encoder.json(object)
+    end
   end
 end
